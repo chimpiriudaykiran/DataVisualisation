@@ -173,3 +173,5 @@ CHANNEL_LAYERS = {
 }
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'aged-pond-04566.pktriot.net', 'datavisualization.nightowlspace.com', '157.245.209.223']
