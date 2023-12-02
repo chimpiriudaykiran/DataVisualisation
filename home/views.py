@@ -10,6 +10,7 @@ from django.contrib.auth import login
 from django.shortcuts import render, redirect
 from .models import UserDetails
 from django.contrib.auth.hashers import make_password
+from django.views.decorators.cache import never_cache
 
 def register(request):
     if request.method == 'POST':
@@ -47,7 +48,8 @@ def register(request):
 
 
 def home(request):
-    return render(request, 'home/welcome.html')
+    cookie_value = request.COOKIES.get('toggleState', 'on')
+    return render(request, 'home/welcome.html', {'cookie_value': cookie_value})
 
 
 def login(request):
@@ -65,8 +67,6 @@ def cards(request):
 def charts(request):
     return render(request, 'charts.html')
 
-def favicon(request):
-    return render(request, '/static/img/favicon.ico')
 
 def resetpwd(request):
     return render(request, 'forgot-password.html')
@@ -74,6 +74,12 @@ def resetpwd(request):
 
 def tables(request):
     return render(request, 'tables.html')
+
+def dashboard(request):
+    return render(request, 'dashboard.html')
+
+def logo(request):
+    return render(request, 'logo.html')
 
 
 # views.py
@@ -85,12 +91,23 @@ import pandas as pd
 def upload_data(request):
     if request.method == 'POST':
         datafile = request.FILES.get('datafile')
+
         if datafile:
-            df = pd.read_csv(datafile)
+            # Check the file extension
+            ext = os.path.splitext(datafile.name)[1]
+            if ext.lower() == '.csv':
+                df = pd.read_csv(datafile)
+            elif ext.lower() in ['.xls', '.xlsx']:
+                df = pd.read_excel(datafile, engine='openpyxl')
+            else:
+                # Handle unsupported file formats
+                return render(request, 'error.html', {'message': 'Unsupported file format'})
+
             # Convert the DataFrame to HTML table
-            data_html = df.to_html(classes='table table-bordered', index=False)
+            data_html = df.to_html(classes='table table-bordered')
             context = {'data_table': data_html}
             return render(request, 'tables.html', context)
+
     return render(request, 'tables.html')
 
 def serve_audio(request, filename):
@@ -101,3 +118,9 @@ def serve_audio(request, filename):
             response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
             return response
     raise Http404
+
+from django.http import HttpResponse
+
+def readCookies(request):
+    cookie_value = request.COOKIES.get('toggleState')
+    return HttpResponse({cookie_value})

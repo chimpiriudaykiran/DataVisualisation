@@ -4,7 +4,7 @@ from django.urls import path, include
 from home.dash_apps.finished_apps import SimpleGraph
 
 urlpatterns = [
-    path('', views.login, name='login'),
+    path('', views.dashboard, name='dashboard'),
     # path('django_plotly_dash/', include('django_plotly_dash.urls')),
     path('home/', views.home, name='home'),
     path('register/', views.register, name='register'),
@@ -14,5 +14,7 @@ urlpatterns = [
     path('tables/', views.tables, name='tables'),
     path('upload-data/', views.upload_data, name='upload_data'),
     path('audio/<filename>', views.serve_audio, name='serve_audio'),
-    path('favicon.ico', views.favicon, name='favicon'),
+    path('login/', views.login , name='login'),
+    path('logo/', views.logo , name='logo'),
+    path('readCookies/', views.readCookies , name='readCookies'),
 ]

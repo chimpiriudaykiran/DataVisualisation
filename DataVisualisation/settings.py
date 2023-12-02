@@ -152,6 +152,8 @@ STATICFILES_FINDERS = [
     'django_plotly_dash.finders.DashComponentFinder'
 ]
 
+TEMPLATES_ROOT = 'templates'
+TEMPLATES_LOCATION = 'templates'
 STATICFILES_LOCATION = 'static'
 STATIC_ROOT = 'static'
 STATICFILES_DIRS = [
@@ -174,4 +176,6 @@ CHANNEL_LAYERS = {
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'aged-pond-04566.pktriot.net', 'datavisualization.nightowlspace.com', '157.245.209.223']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'aged-pond-04566.pktriot.net', 'datavisualization.nightowlspace.com', '157.245.209.223', 'www.nightowlspace.com']
+
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/arcane-boulder-404003-8a768e21b658.json"
