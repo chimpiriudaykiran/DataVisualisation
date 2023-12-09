@@ -1,7 +1,10 @@
 import os
+from datetime import datetime
 
 import pyttsx3
 
+from DataVisualisation import settings
+from home.dash_apps.finished_apps.Text_to_Speech import synthesize_text
 from home.dash_apps.finished_apps.getDownloadFolder import get_downloads_folder
 
 def list_filenames_in_directory(directory_path):
@@ -17,21 +20,17 @@ def list_filenames_in_directory(directory_path):
     except FileNotFoundError:
         print("Directory not found.")
         return []
-def read_filenames_aloud(filenames):
-    """
-    Reads the list of filenames aloud using speech synthesis.
 
-    Args:
-    filenames (list): A list of filenames to be read.
-    """
-    engine = pyttsx3.init()
-    engine.setProperty('rate', 200)
-    for filename in filenames:
-        engine.say(filename)
-        engine.runAndWait()
 
 # Example usage
-downloads_folder_path = get_downloads_folder()
-filenames, numbered_files = list_filenames_in_directory(downloads_folder_path)
-read_filenames_aloud(numbered_files)
-print(numbered_files)
+# downloads_folder_path = get_downloads_folder()
+# filenames, numbered_files = list_filenames_in_directory(downloads_folder_path)
+#
+# # timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+# # audio_filename = f'audio/files_audio_{timestamp}.mp3'
+# #
+# # audio_file_path = os.path.join(settings.MEDIA_ROOT, audio_filename)
+# # synthesize_text(numbered_files, audio_file_path)
+# # audio_url = settings.MEDIA_URL + audio_filename
+#
+# print(numbered_files)

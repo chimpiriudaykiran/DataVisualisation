@@ -179,3 +179,6 @@ X_FRAME_OPTIONS = 'SAMEORIGIN'
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'aged-pond-04566.pktriot.net', 'datavisualization.nightowlspace.com', '157.245.209.223', 'www.nightowlspace.com']
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/arcane-boulder-404003-8a768e21b658.json"
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+CSRF_TRUSTED_ORIGINS = ['https://datavisualization.nightowlspace.com']

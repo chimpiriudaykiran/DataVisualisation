@@ -1,5 +1,8 @@
 import base64
 import io
+import os
+
+import numpy as np
 import pandas as pd
 import plotly.express as px
 from dash import html, dcc, dash
@@ -8,14 +11,35 @@ from dash.exceptions import PreventUpdate
 from django_plotly_dash import DjangoDash
 from dash.dependencies import ClientsideFunction
 import requests
+import plotly.io as pio
+import kaleido
+from datetime import datetime
+
+from gtts import gTTS
+
+from DataVisualisation import settings
+from home.dash_apps.finished_apps.Text_to_Speech import synthesize_text
+# from home.dash_apps.finished_apps.getDownloadFolder import get_downloads_folder
+# from home.dash_apps.finished_apps.getFiles import list_filenames_in_directory
 
 # Initialize the Dash app
 app = DjangoDash('SimpleGraph')
 
-toggleState = requests.get('/readCookies').text
+state = 'on'
+
+# downloads_folder_path = get_downloads_folder()
+# filenames, numbered_files = list_filenames_in_directory(downloads_folder_path)
+#
+# timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+# audio_filename = f'audio/files_audio_{timestamp}.mp3'
+#
+# audio_file_path = os.path.join(settings.MEDIA_ROOT, audio_filename)
+# synthesize_text(numbered_files, audio_file_path)
+# audio_url = settings.MEDIA_URL + audio_filename
 
 # Define the app layout with styled components
 app.layout = html.Div([
+    # html.Audio(src=audio_url, controls=False, autoPlay=True),
     dcc.Upload(
         id='upload-data',
         children=html.Button('Upload File', style={
@@ -27,6 +51,7 @@ app.layout = html.Div([
             'cursor': 'pointer'
         }),
         multiple=False,
+        accept='.csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         style={
             'width': '100%',
             'height': '60px',
@@ -62,8 +87,28 @@ app.layout = html.Div([
             dcc.Dropdown(id='y-axis-dropdown', disabled=False)
         ], style={'display': 'inline-block', 'width': '180px'}),
     ], style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center', 'marginBottom': '20px'}),
-    dcc.Graph(id='graph-output'),
-    html.Div(id='initial-cookie-value', style={'display': 'none'})
+    # dcc.Graph(id='graph-output'),
+    # html.Div(id='text-output'),
+    dcc.Loading(
+        id="loading-1",
+        type="default",  # You can choose from 'graph', 'cube', 'circle', 'dot', or 'default'
+        children=[
+            dcc.Graph(id='graph-output'),
+            html.Div(id='text-output'),
+            html.Div(html.Audio(id='audio-output', controls=True)),
+        ]
+    ),
+    html.Div(id='initial-cookie-value', style={'display': 'none'}),
+    html.Script('''
+    document.addEventListener('keydown', function (e) {
+        if (e.code === 'Space') {
+            var audio = document.getElementById('audio-output');
+            if (audio) {
+                audio.play();
+            }
+        }
+    });
+''')
 ], style={'width': '80%', 'margin': '0 auto'})
 
 # Function to parse uploaded file contents
@@ -97,7 +142,9 @@ def update_dropdowns(contents, filename):
     return options, options
 
 @app.callback(
-    Output('graph-output', 'figure'),
+    [Output('graph-output', 'figure'),
+     Output('text-output', 'children'),
+     Output('audio-output', 'src')],
     [Input('graph-type-radio', 'value'),
      Input('x-axis-dropdown', 'value'),
      Input('y-axis-dropdown', 'value'),
@@ -105,6 +152,7 @@ def update_dropdowns(contents, filename):
     [State('upload-data', 'filename')]
 )
 def update_graph(graph_type, x_axis, y_axis, contents, filename):
+    global image
     if contents is None or graph_type is None:
         return dash.no_update
 
@@ -121,18 +169,88 @@ def update_graph(graph_type, x_axis, y_axis, contents, filename):
 
     if graph_type == 'bar':
         fig = px.bar(df, x=x_axis, y=y_axis)
+        image = fig
+        highest_value = df[y_axis].max()
+        lowest_value = df[y_axis].min()
+        colors = fig.data[0].marker.color
+
+        text = f"This is a bar graph plotted against {x_axis} on the X-axis and {y_axis} on the Y-axis. "
+        text += f"The highest value on the Y-axis is {highest_value}, "
+        text += f"the lowest value is {lowest_value}, and The colors used for markers are as follows:\n"
+        for i, color in enumerate(colors):
+            text += f"Bar {i + 1}: {color}\n"
+
     elif graph_type == 'pie':
         fig = px.pie(df, names=x_axis, values=y_axis)
+        image = fig
+        if fig.data and hasattr(fig.data[0], 'labels') and hasattr(fig.data[0], 'values'):
+            text = f"This is a pie chart showing the distribution across different categories of {x_axis}. "
+            labels = fig.data[0].labels
+            values = fig.data[0].values
+
+            # Check if labels and values are not None
+            if labels is not None and values is not None:
+                labels_list = list(labels)
+                values_list = list(values)
+
+                for i, label in enumerate(labels_list):
+                    value = values_list[i]
+                    text += f"The value for '{label}' is {value}. "
+        else:
+            text = "Unable to generate pie chart description."
+        # try:
+        #     image.write_image('image.png',engine='orca')
+        #     print("Image exported successfully.")
+        # except Exception as e:
+        #     print(f"Error exporting image: {e}")
+
     elif graph_type == 'scatter':
         fig = px.scatter(df, x=x_axis, y=y_axis)
+        image = fig
+        text = f"This is a scatter plot with {x_axis} on the X-axis and {y_axis} on the Y-axis. "
+        text += "It shows the relationship between the two variables. Look for clusters or patterns in the data points."
     elif graph_type == 'line':
         fig = px.line(df, x=x_axis, y=y_axis)
+        image = fig
+        text = f"This line chart plots {y_axis} against {x_axis}. "
+        text += "It is useful for showing trends over time or ordered categories."
     elif graph_type == 'histogram':
         fig = px.histogram(df, x=x_axis)
+        image = fig
+        text = f"This histogram shows the distribution of {x_axis}. "
+        text += "Each bar represents the frequency of data points in each range."
     else:
         fig = dash.no_update
 
-    return fig
+    # try:
+    #     image.write_image('image.png')
+    #     # image_data = pio.to_image(fig, format='png', engine='orca')
+    #     # with open('image.png', 'wb') as f:
+    #     #     f.write(image_data)
+    #     print("Image exported successfully.")
+    # except Exception as e:
+    #     print(f"Error exporting image: {e}")
+
+    # if state == 'on':
+    #     # fig.write_image("image.png")
+    #     image = fig.to_image(format='png')
+    #     # with open("image.png", "rb") as image_files:
+    #     #     encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
+    #     #
+    #     # "data:audio/mpeg;base64," + encoded_string
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    audio_filename = f'audio/text_audio_{timestamp}.mp3'
+
+
+    audio_file_path = os.path.join(settings.MEDIA_ROOT, audio_filename)
+
+    # tts = gTTS(text)
+    # tts.save(audio_file_path)
+    synthesize_text(text, audio_file_path)
+    audio_url = settings.MEDIA_URL + audio_filename
+    # audio_url = settings.MEDIA_URL + 'text_audio_20231202_091411.mp3'
+    return fig, text, audio_url
 
 @app.callback(
     Output('y-axis-dropdown', 'disabled'),

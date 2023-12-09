@@ -19,78 +19,78 @@
 
     <link href="{% static 'vendor/datatables/dataTables.bootstrap4.min.css' %}" rel="stylesheet">
 
-    <script>
-        document.addEventListener('keydown', handleKeyDown);
-document.addEventListener('keyup', handleKeyUp);
-
-let spacebarPressedTime;
-let timeoutId;
-let savedState;
-
-function handleKeyDown(event) {
-    if (event.code === 'Space' && !timeoutId) {
-        spacebarPressedTime = new Date();
-        timeoutId = setTimeout(toggleState, 2000);
-    }
-}
-
-function handleKeyUp(event) {
-    if (event.code === 'Space') {
-        clearTimeout(timeoutId);
-        timeoutId = null;
-    }
-}
-
-function toggleState() {
-    const audioOn = document.getElementById('audioOn');
-    const audioOff = document.getElementById('audioOff');
-    savedState = getCookie('toggleState');
-
-    if (new Date() - spacebarPressedTime >= 2000) {
-
-        if (savedState === 'off') {
-            audioOn.play();
-            setCookie('toggleState', 'on', 7);
-        } else {
-            audioOff.play();
-            setCookie('toggleState', 'off', 7);
-        }
-    }
-
-    timeoutId = null;
-}
-
-function setCookie(name, value, days) {
-    var expires = "";
-    if (days) {
-        var date = new Date();
-        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-        expires = "; expires=" + date.toUTCString();
-    }
-    document.cookie = name + "=" + (value || "")  + expires + "; path=/";
-}
-
-function getCookie(name) {
-    var nameEQ = name + "=";
-    var ca = document.cookie.split(';');
-    for(var i=0;i < ca.length;i++) {
-        var c = ca[i];
-        while (c.charAt(0)==' ') c = c.substring(1,c.length);
-        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-    }
-    return null;
-}
-
-// Play the audio based on the cookie value when the page loads
-window.onload = () => {
-    savedState = getCookie('toggleState');
-    const audioOn = document.getElementById('audioOn');
-
-    if (savedState === 'on') {
-        audioOn.play();
-    }
-}
-    </script>
+{#    <script>#}
+{#        document.addEventListener('keydown', handleKeyDown);#}
+{#document.addEventListener('keyup', handleKeyUp);#}
+{##}
+{#let spacebarPressedTime;#}
+{#let timeoutId;#}
+{#let savedState;#}
+{##}
+{#function handleKeyDown(event) {#}
+{#    if (event.code === 'Space' && !timeoutId) {#}
+{#        spacebarPressedTime = new Date();#}
+{#        timeoutId = setTimeout(toggleState, 2000);#}
+{#    }#}
+{#}#}
+{##}
+{#function handleKeyUp(event) {#}
+{#    if (event.code === 'Space') {#}
+{#        clearTimeout(timeoutId);#}
+{#        timeoutId = null;#}
+{#    }#}
+{#}#}
+{##}
+{#function toggleState() {#}
+{#    const audioOn = document.getElementById('audioOn');#}
+{#    const audioOff = document.getElementById('audioOff');#}
+{#    savedState = getCookie('toggleState');#}
+{##}
+{#    if (new Date() - spacebarPressedTime >= 2000) {#}
+{##}
+{#        if (savedState === 'off') {#}
+{#            audioOn.play();#}
+{#            setCookie('toggleState', 'on', 7);#}
+{#        } else {#}
+{#            audioOff.play();#}
+{#            setCookie('toggleState', 'off', 7);#}
+{#        }#}
+{#    }#}
+{##}
+{#    timeoutId = null;#}
+{#}#}
+{##}
+{#function setCookie(name, value, days) {#}
+{#    var expires = "";#}
+{#    if (days) {#}
+{#        var date = new Date();#}
+{#        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));#}
+{#        expires = "; expires=" + date.toUTCString();#}
+{#    }#}
+{#    document.cookie = name + "=" + (value || "")  + expires + "; path=/";#}
+{#}#}
+{##}
+{#function getCookie(name) {#}
+{#    var nameEQ = name + "=";#}
+{#    var ca = document.cookie.split(';');#}
+{#    for(var i=0;i < ca.length;i++) {#}
+{#        var c = ca[i];#}
+{#        while (c.charAt(0)==' ') c = c.substring(1,c.length);#}
+{#        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);#}
+{#    }#}
+{#    return null;#}
+{#}#}
+{##}
+{#// Play the audio based on the cookie value when the page loads#}
+{#window.onload = () => {#}
+{#    savedState = getCookie('toggleState');#}
+{#    const audioOn = document.getElementById('audioOn');#}
+{##}
+{#    if (savedState === 'on') {#}
+{#        audioOn.play();#}
+{#    }#}
+{#}#}
+{#    </script>#}
 
 </head>
 
@@ -111,9 +111,9 @@ window.onload = () => {
 <!-- End of Page Wrapper -->
 
 <!-- Scroll to Top Button-->
-<a class="scroll-to-top rounded" href="#page-top">
-    <i class="fas fa-angle-up"></i>
-</a>
+<div class="scroll-to-top rounded" onclick="scrollToTop()">
+  <i class="fas fa-angle-up"></i>
+</div>
     <audio id="audioOn" src="{% static 'audio/Synthesis_on.mp3' %}"></audio>
     <audio id="audioOff" src="{% static 'audio/Synthesis_off.mp3' %}"></audio>
 <!-- Bootstrap core JavaScript-->
@@ -132,7 +132,12 @@ window.onload = () => {
 
 <!-- Page level custom scripts -->
 <script src="{% static 'js/demo/datatables-demo.js' %}"></script>
-
+<script>
+  function scrollToTop() {
+    // Scroll to the top of the page
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // Smooth scroll behavior if supported
+  }
+</script>
 </body>
 
 </html>

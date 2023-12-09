@@ -94,6 +94,17 @@
     max-height: 400px; // Example fixed height
 }
     </style>
+
+    <style>
+    .card-header .text-primary {
+        color: #000000; /* Change this to a darker color for better contrast */
+    }
+
+    .card-header {
+        background-color: #FFFFFF; /* Change this to a lighter color for better contrast */
+    }
+</style>
+
 </head>
 
 <body id="page-top">
@@ -103,12 +114,7 @@
     <!-- Sidebar -->
     {% include 'partials/_sidebar.html' %}
     <!-- End of Sidebar -->
-    <!-- Sidebar Toggle (Topbar) -->
-    <form class="form-inline">
-      <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-        <i class="fa fa-bars"></i>
-      </button>
-    </form>
+
     <!-- Content Wrapper -->
     <div id="content-wrapper" class="d-flex flex-column">
 
@@ -119,16 +125,21 @@
 
           <!-- DataTales Example -->
           <div class="card shadow mb-4">
-            <div class="card-header py-3">
-              <h6 class="m-0 font-weight-bold text-primary">DataTables</h6>
-            </div>
+            <div class="card-header py-3" style="background-color: #FFFFFF;"> <!-- Lighten the background -->
+  <h6 class="m-0 font-weight-bold text-primary"> <!-- Darken the text -->
+    DataTables
+  </h6>
+</div>
+
             <div class="card-body">
                 <form action="{% url 'upload_data' %}" method="post" enctype="multipart/form-data" id="uploadForm" autocomplete="off">
                   {% csrf_token %}
 
                   <div align="center">
-                    <label for="file-upload" style="color: white; background-color: rgb(0, 123, 255); padding: 10px; border: none; border-radius: 5px; cursor: pointer;">Upload
-                      File</label>
+                    <label for="file-upload" style="color: rgb(255, 255, 255); background-color: rgb(0, 100, 200); padding: 10px; border: none; border-radius: 5px; cursor: pointer;">
+    Upload File
+</label>
+
                     <input id="file-upload" type="file" name="datafile" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" autocomplete="off" style="display: none;" onchange="document.getElementById('uploadForm').submit();">
                   </div>
                 </form>
@@ -155,9 +166,9 @@
   <!-- End of Page Wrapper -->
 
   <!-- Scroll to Top Button-->
-  <a class="scroll-to-top rounded" href="#page-top">
-    <i class="fas fa-angle-up"></i>
-  </a>
+  <div class="scroll-to-top rounded" onclick="scrollToTop()">
+  <i class="fas fa-angle-up"></i>
+</div>
 
 
   <!-- Bootstrap core JavaScript-->
@@ -180,7 +191,12 @@
   <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
   <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
   <script src="{% static 'js/sb-admin-2.min.js' %}"></script>
-
+<script>
+  function scrollToTop() {
+    // Scroll to the top of the page
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // Smooth scroll behavior if supported
+  }
+</script>
 </body>
 
 </html>

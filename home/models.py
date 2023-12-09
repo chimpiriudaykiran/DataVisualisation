@@ -14,3 +14,5 @@ class UserDetails(models.Model):
 
     class Meta:
         db_table = 'userdetails'  # Ensure this matches your actual table name
+
+    my_file = models.FileField(upload_to='audio/')

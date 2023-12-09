@@ -2,13 +2,16 @@ import io
 import os
 from google.cloud import texttospeech
 
-def synthesize_text(input_text, output_filename="output.mp3"):
+from DataVisualisation import settings
+
+
+def synthesize_text(input_text, output_filename):
 
     # Set environment variable for Google Cloud credentials
     credentials_path = "arcane-boulder-404003-8a768e21b658.json"
     print("Full path to credentials:", os.path.abspath(credentials_path))
 
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "arcane-boulder-404003-8a768e21b658.json"
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = 'media/json/arcane-boulder-404003-8a768e21b658.json'
     # Initialize the Text-to-Speech client
     client = texttospeech.TextToSpeechClient()
 
@@ -36,4 +39,4 @@ def synthesize_text(input_text, output_filename="output.mp3"):
         print(f'Audio content written to file "{output_filename}"')
 
 # Example usage
-synthesize_text("Please say 'Visualization' to start visualizing your data.")
+# synthesize_text("Please say 'Visualization' to start visualizing your data.", "output.mp3")

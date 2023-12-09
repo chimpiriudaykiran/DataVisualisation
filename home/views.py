@@ -51,6 +51,9 @@ def home(request):
     cookie_value = request.COOKIES.get('toggleState', 'on')
     return render(request, 'home/welcome.html', {'cookie_value': cookie_value})
 
+# def tables(request):
+#     cookie_value = request.COOKIES.get('toggleState', 'on')
+#     return render(request, 'home/table.html', {'cookie_value': cookie_value})
 
 def login(request):
     return render(request, 'login.html')
